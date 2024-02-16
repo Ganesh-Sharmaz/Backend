@@ -1,5 +1,8 @@
 import mongoose from "mongoose"
 import { DB_NAME } from "./constants";
+import connectDB from "./db";
+
+connectDB()
 
 
 
@@ -7,7 +10,23 @@ import { DB_NAME } from "./constants";
 
 
 
-// import express from "express"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ // import express from "express"
 // const app = express();
 
 // ;( async () => {
