@@ -3,8 +3,10 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.models.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
+import jwt from "jsonwebtoken"
+import { Mongoose } from "mongoose";
 
-const generateAccessAndRefreshToken = async(userId) {
+const generateAccessAndRefreshToken = async(userId) => {
     try {
         const user = await User.findById(userId)
         const accessToken = user.generateAccessToken()
@@ -104,9 +106,10 @@ const   loginUser = asyncHandler( async (req, res) => {
     // send cookies
     // login user
 
-    const {email, username, password} = req.body
+    const { email, username, password} = req.body
+    console.log(email, password);
 
-    if (!email || !username) {
+    if (!email && !username) {
         throw new ApiError(400, 'username or email is required');
     }
 
@@ -124,9 +127,9 @@ const   loginUser = asyncHandler( async (req, res) => {
         throw new ApiError(404, "invalid user credentials")
     }
 
-    const {accessToken, refreshToken} = await generateAccessAndRefreshTokenAsync(user._id)
+    const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id)
 
-    const loggedInUser = User.findById(user._id).select("-password -refreshToken")
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
     const options = {
         httpOnly: true,
@@ -137,6 +140,7 @@ const   loginUser = asyncHandler( async (req, res) => {
     .status(200)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
+    // console.log("working")
     .json(
         new ApiResponse(
             200,
